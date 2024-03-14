@@ -1,51 +1,35 @@
-// Write your code below:
-// storing to local storage
-function handleFormSubmit(event) {
+const form = document.querySelector('form')
+const list = document.querySelector('#expense-list')
+form.addEventListener('submit', function (event) {
     event.preventDefault()
-    // inititalize input texts
-    const username = event.target.username.value
-    const email = event.target.email.value
-    const phone = event.target.phone.value
-    // object created
-    const userobj = {
-        username,
-        email,
-        phone
+    const amount = event.target.amount.value
+    const description = event.target.description.value
+    const category = event.target.category.value
+    const newLi = document.createElement('li')
+    newLi.innerHTML += amount + ' - ' + description + ' - ' + category + ' - ' + '<button type="submit" class="delete-btn">Delete Expense</button> ' + '<button type="submit" class="edit-btn">Edit Expense</button>'
+    list.appendChild(newLi)
+    localStorage.setItem('data', list.innerHTML)
+})
+list.addEventListener('click', function (event) {
+    event.preventDefault()
+    if (event.target.classList.contains('delete-btn')) {
+        var expenseToDelete = event.target.parentElement
+        list.removeChild(expenseToDelete)
     }
-    // sterialized
-    const userobj_serialized = JSON.stringify(userobj)
-    // storing to localStorage
-    localStorage.setItem(userobj.email, userobj_serialized)
-    showUserOnScreen(userobj)
+    localStorage.setItem('data', list.innerHTML)
+})
+list.addEventListener('click', function (event) {
+    event.preventDefault()
+    if (event.target.classList.contains('edit-btn')) {
+        var expenseToDelete = event.target.parentElement
+        document.querySelector('#amount').value=expenseToDelete.textContent.split(' - ')[0]
+        document.querySelector('#description').value=expenseToDelete.textContent.split(' - ')[1]
+        document.querySelector('#category').value=expenseToDelete.textContent.split(' - ')[2]
+        list.removeChild(expenseToDelete)
+    }
+    localStorage.setItem('data', list.innerHTML)
+})
+function onscreen() {
+    list.innerHTML = localStorage.getItem('data')
 }
-
-function showUserOnScreen(obj) {
-    // adding unordered list
-    const parentElem = document.getElementById('listofItems')
-    const childElem = document.createElement('li')
-    childElem.textContent = obj.username + ' - ' + obj.email + ' - ' + obj.phone
-    const deleteButton = document.createElement('button')
-    deleteButton.type = 'submit'
-    deleteButton.textContent = 'Delete'
-    deleteButton.onclick = () =>{
-        localStorage.removeItem(obj.email)
-        parentElem.removeChild(childElem)
-    }
-    const editButton = document.createElement('button')
-    editButton.type = 'submit'
-    editButton.textContent = 'Edit'
-    editButton.onclick = () =>{
-        localStorage.removeItem(obj.email)
-        parentElem.removeChild(childElem)
-        document.getElementById('username').value=obj.username
-        document.getElementById('email').value=obj.email
-        document.getElementById('phone').value=obj.phone
-    }
-
-
-    childElem.appendChild(editButton)
-    childElem.appendChild(deleteButton)
-    parentElem.appendChild(childElem)
-}
-
-module.exports = handleFormSubmit
+onscreen()
